@@ -1,54 +1,75 @@
-import time
-import torch
-import torch.nn as nn
-import torch.backends.cudnn as cudnn
-import torchvision.models as models
-from torch.autograd import Variable
+import keras
+import keras.backend as K
+from keras.models import Model
+from keras.layers import Input, Dense, Conv2D, Conv3D, DepthwiseConv2D, SeparableConv2D, Conv3DTranspose
+from keras.layers import Flatten, MaxPool2D, AvgPool2D, GlobalAvgPool2D, UpSampling2D, BatchNormalization
+from keras.layers import Concatenate, Add, Dropout, ReLU, Lambda, Activation, LeakyReLU, PReLU
+
+from IPython.display import SVG
+from keras.utils.vis_utils import model_to_dot
+
+from time import time
+import numpy as np
 
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
 
-        def conv_bn(inp, oup, stride):
-            return nn.Sequential(
-                nn.Conv2d(inp, oup, 3, stride, 1, bias=False, ),
-                nn.BatchNorm2d(oup),
-                nn.ReLU(inplace=True)
-            )
-
-        def conv_dw(inp, oup, stride):
-            return nn.Sequential(
-                nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False),
-                nn.BatchNorm2d(inp),
-                nn.ReLU(inplace=True),
+def mobilenet(input_shape, n_classes):
+  
+  def mobilenet_block(x, f, s=1):
+    x = DepthwiseConv2D(3, strides=s, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
     
-                nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
-                nn.BatchNorm2d(oup),
-                nn.ReLU(inplace=True),
-            )
+    x = Conv2D(f, 1, strides=1, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    return x
+    
+    
+  input = Input(input_shape)
 
-        self.model = nn.Sequential(
-            conv_bn(  3,  32, 2), 
-            conv_dw( 32,  64, 1),
-            conv_dw( 64, 128, 2),
-            conv_dw(128, 128, 1),
-            conv_dw(128, 256, 2),
-            conv_dw(256, 256, 1),
-            conv_dw(256, 512, 2),
-            conv_dw(512, 512, 1),
-            conv_dw(512, 512, 1),
-            conv_dw(512, 512, 1),
-            conv_dw(512, 512, 1),
-            conv_dw(512, 512, 1),
-            conv_dw(512, 1024, 2),
-            conv_dw(1024, 1024, 1),
-            nn.AvgPool2d(7),
-        )
-        self.fc = nn.Linear(1024, 1000)
+  x = Conv2D(32, 3, strides=2, padding='same')(input)
+  x = BatchNormalization()(x)
+  x = ReLU()(x)
 
-    def forward(self, x):
-        x = self.model(x)
-        x = x.view(-1, 1024)   # reshape    >>>     view  vs  reshape    view는 연속적인 tensor에서만 작동한다. reshape는 연속적 비연속적 tensor에서 다 작동한다.
-        x = self.fc(x)
-        return x
+  x = mobilenet_block(x, 64)
+  x = mobilenet_block(x, 128, 2)
+  x = mobilenet_block(x, 128)
+
+  x = mobilenet_block(x, 256, 2)
+  x = mobilenet_block(x, 256)
+
+  x = mobilenet_block(x, 512, 2)
+  for _ in range(5):
+    x = mobilenet_block(x, 512)
+
+  x = mobilenet_block(x, 1024, 2)
+  x = mobilenet_block(x, 1024)
+  
+  x = GlobalAvgPool2D()(x)
+  
+  output = Dense(n_classes, activation='softmax')(x)
+  
+  model = Model(input, output)
+  return model
+
+
+input_shape = 224, 224, 3
+n_classes = 1000
+
+K.clear_session()
+model = mobilenet(input_shape, n_classes)
+model.summary()
+
+# SVG(model_to_dot(model).create(prog='dot', format='svg'))
+
+
+repetitions = 10
+input = np.random.randn(1, *input_shape)
+
+output = model.predict(input)
+start = time()
+for _ in range(repetitions):
+  output = model.predict(input)
+  
+print((time() - start) / repetitions)
