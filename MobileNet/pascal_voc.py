@@ -52,8 +52,8 @@ class myVOCDetection(VOCDetection):
     def __getitem__(self, index):
         img = np.array(Image.open(self.images[index]).convert('RGB'))  # 여기서 image를 resize해줘야 할거 같은데 아닌가?
         # img = np.resize(img, (224,-1))
+        # img size processing
         img = T.ToTensor()(img)
-        size = img.size
         transform = T.Resize(size = (224,224))
         img = transform(img)
         
