@@ -16,6 +16,7 @@ import cv2
 from typing import Dict, Any
 from collections import OrderedDict
 import collections
+import tensorflow as tf
 
 
 path2data = 'pascal_VOC'
@@ -51,11 +52,10 @@ classes = [
 class myVOCDetection(VOCDetection):
     def __getitem__(self, index):
         img = np.array(Image.open(self.images[index]).convert('RGB'))  # 여기서 image를 resize해줘야 할거 같은데 아닌가?
-        # img = np.resize(img, (224,-1))
-        # img size processing
-        img = T.ToTensor()(img)
-        transform = T.Resize(size = (224,224))
-        img = transform(img)
+        img_2_ten = T.ToTensor()(img)
+        re_img = T.Resize(size = (224,224))(img_2_ten)
+        img_np = re_img.numpy()
+        img = tf.convert_to_tensor(img_np)
         
         target = self.parse_voc_xml(ET.parse(self.annotations[index]).getroot()) # xml파일 분석하여 dict으로 받아오기
 
@@ -97,19 +97,15 @@ class myVOCDetection(VOCDetection):
     
     
 train_ds = myVOCDetection(path2data, year='2007', image_set='train', download=True)
-img, target, label = train_ds[2]
-print(img.shape)
+# img, target, label = train_ds[2]
+# print(img.dtype)  >  (3, 244, 244)
+test_ds = myVOCDetection(path2data, year='2007', image_set='test', download=True)
 
 
-'''
-train_dataloader = DataLoader(train_data, batch_size=12, shuffle=True)    # collate_fn
-test_dataloader = DataLoader(test_data, batch_size=12, shuffle=True)
 
 
-train_dataloader_iter = iter(train_dataloader)
-img, tar, lab = train_dataloader_iter.next()
-print(img.size())
-'''
+
+
 
 
 
