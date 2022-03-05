@@ -17,6 +17,7 @@ from typing import Dict, Any
 from collections import OrderedDict
 import collections
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 
 path2data = 'pascal_VOC'
@@ -55,12 +56,15 @@ class myVOCDetection(VOCDetection):
         img_2_ten = T.ToTensor()(img)
         re_img = T.Resize(size = (224,224))(img_2_ten)
         img_np = re_img.numpy()
-        img = tf.convert_to_tensor(img_np)
+        # img = tf.convert_to_tensor(img_np)
+        img = np.reshape(img_np, [224, 224, 3],)
+        img = np.uint8(img)                       # 이 코드는 필요한지 아닌지 모르겠음.
         
         target = self.parse_voc_xml(ET.parse(self.annotations[index]).getroot()) # xml파일 분석하여 dict으로 받아오기
 
         targets = [] # 바운딩 박스 좌표
         labels = [] # 바운딩 박스 클래스
+        labels_one_hot = np.zeros(shape=(20,), dtype=np.int32)
 
         # 바운딩 박스 정보 받아오기
         for t in target['annotation']['object']:
@@ -68,14 +72,17 @@ class myVOCDetection(VOCDetection):
             label[:] = t['bndbox']['xmin'], t['bndbox']['ymin'], t['bndbox']['xmax'], t['bndbox']['ymax'], classes.index(t['name'])
 
             targets.append(list(label[:4])) # 바운딩 박스 좌표
-            labels.append(label[4])         # 바운딩 박스 클래스
-
+            labels.append(int(label[4]))         # 바운딩 박스 클래스  > labels를 받고 이걸 one-hot-encoding해준다음 그걸 새로운 리스트에 넣어줘야 할거 같은데??
+            labels_one_hot[labels] = 1
+            
+        
+        
         if self.transforms:
             augmentations = self.transforms(image=img, bboxes=targets)
             img = augmentations['image']
             targets = augmentations['bboxes']
 
-        return img, targets, labels
+        return img, targets, labels, labels_one_hot
 
     def parse_voc_xml(self, node: ET.Element) -> Dict[str, Any]:    # xml 파일을 dictionary로 반환
         voc_dict: Dict[str, Any] = {}
@@ -97,12 +104,11 @@ class myVOCDetection(VOCDetection):
     
     
 train_ds = myVOCDetection(path2data, year='2007', image_set='train', download=True)
-# img, target, label = train_ds[2]
-# print(img.dtype)  >  (3, 244, 244)
-test_ds = myVOCDetection(path2data, year='2007', image_set='test', download=True)
+# test_ds = myVOCDetection(path2data, year='2007', image_set='test', download=True)
+img, target, label, labels_one_hot = next(iter(train_ds))
 
 
-
+print(labels_one_hot) # 몇 번째 label를 넣어줘야 할지 모르겠음.
 
 
 
