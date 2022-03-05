@@ -6,11 +6,13 @@ from keras.layers import Flatten, MaxPool2D, AvgPool2D, GlobalAvgPool2D, UpSampl
 from keras.layers import Concatenate, Add, Dropout, ReLU, Lambda, Activation, LeakyReLU, PReLU
 
 from IPython.display import SVG
+from tensorflow import keras
 from keras.utils.vis_utils import model_to_dot
 
 from time import time
 import numpy as np
 
+from pascal_voc import *
 
 
 def mobilenet(input_shape, n_classes):
@@ -46,30 +48,36 @@ def mobilenet(input_shape, n_classes):
   x = mobilenet_block(x, 1024, 2)
   x = mobilenet_block(x, 1024)
   
-  x = GlobalAvgPool2D()(x)
+  x = GlobalAvgPool2D()(x) # TODO: look it up
   
   output = Dense(n_classes, activation='softmax')(x)
   
   model = Model(input, output)
-  return model
+  return model, output
 
 
-input_shape = 224, 224, 3
-n_classes = 1000
+# input_shape = 224, 224, 3
+n_classes = 20
 
-K.clear_session()
-model = mobilenet(input_shape, n_classes)
-model.summary()
+# img, _, _ = next(iter(train_ds))
+# input_shape = img.shape
+
+# K.clear_session()
+model, output_ = mobilenet(img.shape , n_classes)
+# model.summary()
+print(output_)
+
 
 # SVG(model_to_dot(model).create(prog='dot', format='svg'))
 
 
-repetitions = 10
-input = np.random.randn(1, *input_shape)
 
-output = model.predict(input)
-start = time()
-for _ in range(repetitions):
-  output = model.predict(input)
-  
-print((time() - start) / repetitions)
+
+
+
+
+
+
+
+
+
