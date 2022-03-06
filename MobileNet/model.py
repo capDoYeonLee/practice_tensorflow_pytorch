@@ -64,11 +64,31 @@ n_classes = 20
 
 # K.clear_session()
 model, output_ = mobilenet(img.shape , n_classes)
-# model.summary()
-print(output_)
+model.summary()
+# print(output_)
 
 
 # SVG(model_to_dot(model).create(prog='dot', format='svg'))
+base_learning_rate = 0.0001
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
+              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+
+initial_epochs = 10
+history = model.fit(x=train_x, y=train_y,
+                    epochs=initial_epochs,
+                    batch_size=16
+                    # validation_data=validation_dataset
+                    
+                    )
+
+
+
+
+
+
+
 
 
 
