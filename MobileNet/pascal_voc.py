@@ -106,9 +106,14 @@ class myVOCDetection(VOCDetection):
 train_ds = myVOCDetection(path2data, year='2007', image_set='train', download=True)
 # test_ds = myVOCDetection(path2data, year='2007', image_set='test', download=True)
 img, target, label, labels_one_hot = next(iter(train_ds))
+train_x, train_y = img, labels_one_hot
+train_x = train_x.reshape(1, 224, 224, 3)
+train_y = train_y.reshape(1, 20, )
+
+# print(train_y.shape)
 
 
-print(labels_one_hot) # 몇 번째 label를 넣어줘야 할지 모르겠음.
+# print(labels_one_hot) # 몇 번째 label를 넣어줘야 할지 모르겠음.
 
 
 
