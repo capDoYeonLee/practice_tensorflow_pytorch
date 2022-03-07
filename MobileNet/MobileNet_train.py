@@ -12,10 +12,14 @@ reduceLR = ReduceLROnPlateau( monitor='val_loss',factor=0.5,patience=3,)
 
 
 inputs = Input(shape = (32,32,3),dtype=np.float32)
+
 x = mobilenetv1(inputs)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
 outputs = Dense(10, activation='softmax')(x)
+
 model = tf.keras.models.Model(inputs,outputs)
+
+
 nadam = tf.keras.optimizers.Nadam(lr=0.01)
 model.compile(optimizer=nadam,loss='categorical_crossentropy',metrics=['accuracy'])
 
