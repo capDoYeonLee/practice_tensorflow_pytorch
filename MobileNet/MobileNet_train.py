@@ -1,26 +1,25 @@
 from model import *
-from pascal_voc import *
+from cifar10_dataset import *
 import tensorflow as tf
 
 
 
 
+filename = 'checkpoint-epoch-{}-batch-{}-trial-001.h5'.format(30, 128)
+checkpoint = ModelCheckpoint(filename,monitor='val_loss', verbose=1,save_best_only=True, mode='auto')
+earlystopping = EarlyStopping(monitor='val_loss',patience=10)
+reduceLR = ReduceLROnPlateau( monitor='val_loss',factor=0.5,patience=3,)
 
 
-base_learning_rate = 0.0001
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+inputs = Input(shape = (32,32,3),dtype=np.float32)
+x = mobilenetv1(inputs)
+x = tf.keras.layers.GlobalAveragePooling2D()(x)
+outputs = Dense(10, activation='softmax')(x)
+model = tf.keras.models.Model(inputs,outputs)
+nadam = tf.keras.optimizers.Nadam(lr=0.01)
+model.compile(optimizer=nadam,loss='categorical_crossentropy',metrics=['accuracy'])
 
-
-
-initial_epochs = 10
-history = model.fit(x=train_x, y=train_y,
-                    epochs=initial_epochs,
-                    # validation_data=validation_dataset
-                    batch_size=32
-                    )
-                    
+model.fit(x_train,y_train,batch_size=128, epochs=30,validation_split=0.1,callbacks=[reduceLR,checkpoint,earlystopping])
 
 
 
