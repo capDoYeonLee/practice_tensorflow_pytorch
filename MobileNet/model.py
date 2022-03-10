@@ -6,7 +6,7 @@ from keras.layers import Input, Dense, Conv2D, Conv3D, DepthwiseConv2D, Separabl
 from keras.layers import Flatten, MaxPool2D, AvgPool2D, GlobalAvgPool2D, UpSampling2D, BatchNormalization
 from keras.layers import Concatenate, Add, Dropout, ReLU, Lambda, Activation, LeakyReLU, PReLU
 from tensorflow.keras.callbacks import ReduceLROnPlateau,ModelCheckpoint, EarlyStopping
-
+from tensorflow.keras.models import Sequential
 from IPython.display import SVG
 from tensorflow import keras
 from keras.utils.vis_utils import model_to_dot
@@ -43,12 +43,98 @@ def mobilenetv1(x,alph = 1): # 224 224 3
 
 
 
-model = tf.keras.Sequentail(
-    
-)
+model = Sequential()
+model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', input_shape=(32,32,3)))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(32, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(64, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(64, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(128, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(128, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(128, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(128, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(256, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(256, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(256, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(256, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(512, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+model.add(DepthwiseConv2D(512, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(1024, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(DepthwiseConv2D(1024, (3,3), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Conv2D(1024, (1,1), strides=(1,1), padding='same'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+model.add(GlobalAvgPool2D())
+model.add(Dense(1000))
 
 
 
 
 
+
+model.summary()
 
