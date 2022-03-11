@@ -1,0 +1,19 @@
+isinstance 뭐임?
+ nn.init.kaiming_normal_ ?
+ nn.init.constant_  ?
+ nn.init.normal_   ?
+
+
+
+torch.ne
+> 각 텐서의 요소(element)들을 element-wise로 각각 비교해 다르면 True를, 같으면 False를 반환한다. 
+- 형태 : torch.ne(비교 대상 tensor, 비교할 tensor나 value, *, out=None) → Tensor
+- torch.not_equal과 동일
+EX) 
+>>> torch.ne(torch.tensor([[2, 5], [4, 3]]), torch.tensor([[2, 8], [2, 3]]))
+# 결과 : tensor([[False, True], [True, False]])
+
+
+torch.eq
+> ne와 반대로 각 텐서의 요소(element)들을 비교해 같으면 True를, 다르면 False를 반환한다.
+- 형태 : torch.eq(비교 대상 tensor, 비교할 tensor나 value, *, out=None) → Tensor
