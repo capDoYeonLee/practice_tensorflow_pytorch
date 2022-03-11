@@ -1,4 +1,6 @@
 isinstance 뭐임?
+> isinstance(m, nn.Conv2d)    m이 conv2d이면 True를 반환한다. 아니라면 False를 반환한다.
+
  nn.init.kaiming_normal_ ?
  nn.init.constant_  ?
  nn.init.normal_   ?
@@ -17,3 +19,10 @@ EX)
 torch.eq
 > ne와 반대로 각 텐서의 요소(element)들을 비교해 같으면 True를, 다르면 False를 반환한다.
 - 형태 : torch.eq(비교 대상 tensor, 비교할 tensor나 value, *, out=None) → Tensor
+
+
+
+Pytorch에서 Dataloader를 사용하는 이유?
+dataloader class는 batch기반의 딥러닝 학습을 위해 mini batch를 만들어주는 역할이다.
+dataloader를 통해 dataset의 전체 데이터가 batch size로 slice된다. 
+앞서 만들었던 dataset을 input으로 넣어주면 여러 옵션(데이터 묶기, 섞기, 병렬처리)을 통해 batch를 만들어준다.
