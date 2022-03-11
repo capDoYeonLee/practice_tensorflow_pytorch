@@ -1,0 +1,30 @@
+train할 때 어떻게 trian data를 넣어줘야 할지 모르겠음.
+ > fit x는 image인거 같은데 y는 값이 (20,)으로 나와야 될거 같음.
+
+pascal_voc.py에서 labels값이 분명 output값인데 값을 어떻게 빼야될지 모르겠음.
+> labels값을 one_hot_encoding까지 해줬는데 labels값이 몇번째 인덱스 인지 모르겠음 아직.
+
+
+
+ValueError: Data cardinality is ambiguous:
+train_x, train_y batch_size가 다른듯
+
+
+
+accuracy 값이 제대로 안나온다. y값이 잘몬된듯 싶다..
+
+
+
+지금 ValueError: `logits` and `labels` must have the same shape, received ((None, 10) vs (None, 10, 50000)). error가 뜸.
+신경망 output이랑 y_train shape가 안맞는거 같음
+
+
+
+
+일단 train을 시켰음. 그 후에 모델 다시 리뷰하고 sequtional다시 맞춰주면 될거 같음.
+
+
+자 여기서 중요한점 이미지의 사이즈는 아무렇게나 넣어도 된다. Mobilenet 논문에선느 224*224 image size를 맞춰줬지만 나는 32*32로 맞췄다.
+그런데 image size를 32*32로 쓰면 모델을 굳이 깊게 써도 의미가 없다는 뜻이다. 비유를 하자면 저용량 게임을 하는데 3080을 쓰는느낌이랄까?
+
+
