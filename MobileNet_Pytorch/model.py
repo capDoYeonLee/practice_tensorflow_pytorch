@@ -7,7 +7,7 @@ from torch import optim
 
 class Depthwise(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
-        super().init()
+        super().__init__()
         
         self.depthwise = nn.Sequential(
             nn.Conv2d(in_channels, in_channels, 3, stride=stride, padding=1, groups=in_channels, bias=False), # 3 is kernel size
@@ -31,13 +31,13 @@ class Depthwise(nn.Module):
 class BasicConv2d(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, **kwargs):
         super().__init__()
-        
-        self.conv == nn.Sequential(
+
+        self.conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size, **kwargs),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU(),
+            nn.ReLU()
         )
-    
+
     def forward(self, x):
         x = self.conv(x)
         return x
@@ -45,7 +45,7 @@ class BasicConv2d(nn.Module):
 
 
 
-class MobileNet(nn.module):
+class MobileNet(nn.Module):
     def __init__(self, width_multiplier, num_classes=10, init_weights=True):
         super().__init__()
         self.init_weights = init_weights
@@ -101,3 +101,39 @@ class MobileNet(nn.module):
         x = x.view(x.size(0), -1)      # 뭐지?
         x = self.linear(x)
         return x
+    
+    
+    # weights initialization function
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+
+
+
+def mobilenet(alpha=1, num_classes=10):
+    return MobileNet(alpha, num_classes)
+
+
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+x = torch.randn((3, 3, 224, 224)).to(device)
+model = mobilenet(alpha=1).to(device)
+output = model(x)
+print('output size:', output.size())
+
+
+summary(model, (3, 224, 224), device=device.type)
+
+
+
+
+
